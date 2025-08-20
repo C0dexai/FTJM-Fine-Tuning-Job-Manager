@@ -12,6 +12,8 @@ interface CreateContainerModalProps {
 
 const CreateContainerModal: React.FC<CreateContainerModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [name, setName] = useState('');
+  const [apiName, setApiName] = useState('');
+  const [apiKey, setApiKey] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -24,7 +26,13 @@ const CreateContainerModal: React.FC<CreateContainerModalProps> = ({ isOpen, onC
     setError('');
     setIsSubmitting(true);
     
-    await onSubmit({ name });
+    await onSubmit({
+      name,
+      env: {
+        API_NAME: apiName || undefined,
+        API_KEY: apiKey || undefined,
+      }
+    });
 
     setIsSubmitting(false);
     onClose();
@@ -32,6 +40,8 @@ const CreateContainerModal: React.FC<CreateContainerModalProps> = ({ isOpen, onC
   
   const resetForm = () => {
     setName('');
+    setApiName('');
+    setApiKey('');
     setError('');
   };
 
@@ -54,6 +64,31 @@ const CreateContainerModal: React.FC<CreateContainerModalProps> = ({ isOpen, onC
             placeholder="e.g., My Project Environment"
             required
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="api_name" className="block text-sm font-medium text-gray-300 mb-1">API Name (Optional)</label>
+            <input
+              type="text"
+              id="api_name"
+              value={apiName}
+              onChange={(e) => setApiName(e.target.value)}
+              className="form-input"
+              placeholder="e.g., OPENAI_API_KEY"
+            />
+          </div>
+          <div>
+            <label htmlFor="api_key" className="block text-sm font-medium text-gray-300 mb-1">API Key (Optional)</label>
+            <input
+              type="password"
+              id="api_key"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="form-input"
+              placeholder="Enter your API key"
+            />
+          </div>
         </div>
         
         {error && <p className="text-red-400 text-sm">{error}</p>}

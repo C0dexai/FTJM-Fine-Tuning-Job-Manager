@@ -15,6 +15,7 @@ let containers: Container[] = [
     status: 'running',
     last_active_at: Date.now() / 1000 - 60,
     expires_after: { anchor: 'last_active_at', minutes: 20 },
+    env: { API_NAME: 'GEMINI_API', API_KEY: 'gsk_mockkey123456789' },
   },
   {
     id: 'cntr_def456',
@@ -24,6 +25,7 @@ let containers: Container[] = [
     status: 'stopped',
     last_active_at: Date.now() / 1000 - 43200,
     expires_after: { anchor: 'last_active_at', minutes: 20 },
+    env: {},
   },
    {
     id: 'cntr_ghi789',
@@ -33,6 +35,7 @@ let containers: Container[] = [
     status: 'creating',
     last_active_at: Date.now() / 1000 - 300,
     expires_after: { anchor: 'last_active_at', minutes: 20 },
+    env: {},
   },
 ];
 
@@ -69,6 +72,7 @@ export const createContainer = (payload: CreateContainerPayload): Promise<Contai
     status: 'running',
     last_active_at: Date.now() / 1000,
     expires_after: { anchor: 'last_active_at', minutes: 20 },
+    env: payload.env,
   };
   containers.push(newContainer);
   containerFiles[newContainer.id] = [];

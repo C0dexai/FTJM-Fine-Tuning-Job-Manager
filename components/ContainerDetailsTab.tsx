@@ -15,6 +15,10 @@ const DetailItem: React.FC<{ label: string; children: React.ReactNode }> = ({ la
 );
 
 const ContainerDetailsTab: React.FC<ContainerDetailsTabProps> = ({ container }) => {
+  const maskedApiKey = container.env?.API_KEY 
+    ? `${container.env.API_KEY.substring(0, 4)}...${container.env.API_KEY.slice(-4)}`
+    : undefined;
+
   return (
     <Card>
       <h3 className="text-lg font-semibold text-white mb-4">Container Details</h3>
@@ -27,6 +31,8 @@ const ContainerDetailsTab: React.FC<ContainerDetailsTabProps> = ({ container }) 
         <DetailItem label="Expires After">
           {`${container.expires_after.minutes} minutes from ${container.expires_after.anchor.replace('_', ' ')}`}
         </DetailItem>
+        <DetailItem label="API Name">{container.env?.API_NAME}</DetailItem>
+        <DetailItem label="API Key">{maskedApiKey}</DetailItem>
       </dl>
     </Card>
   );

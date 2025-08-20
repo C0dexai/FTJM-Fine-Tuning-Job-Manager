@@ -141,6 +141,10 @@ export interface Container {
   };
   last_active_at: number;
   name: string;
+  env?: {
+    API_NAME?: string;
+    API_KEY?: string;
+  };
 }
 
 export interface ContainerFile {
@@ -155,6 +159,10 @@ export interface ContainerFile {
 
 export interface CreateContainerPayload {
   name: string;
+  env?: {
+    API_NAME?: string;
+    API_KEY?: string;
+  };
 }
 
 
