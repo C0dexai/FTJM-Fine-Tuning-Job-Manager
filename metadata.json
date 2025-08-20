@@ -1,0 +1,6 @@
+{
+  "name": "FTJM-Fine-Tuning Job Manager",
+  "description": "This system orchestrates agent-to-agent automation and knowledge management across two domains via API, leveraging supervised cross-relational intelligence from GEMINI and OPENAI for fully autonomous, contextual, and auditable updates and documentation workflows.",
+  "requestFramePermissions": [],
+  "prompt": "This system orchestrates agent-to-agent automation and knowledge management across two domains via API, leveraging supervised cross-relational intelligence from GEMINI and OPENAI for fully autonomous, contextual, and auditable updates and documentation workflows."
+}

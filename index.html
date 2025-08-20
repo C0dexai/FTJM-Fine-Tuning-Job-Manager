@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fine-Tuning Job Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --bg-color: #121212;
+        --card-bg-color: rgba(22, 22, 22, 0.7);
+        --card-border-color: rgba(138, 43, 226, 0.3); /* blueviolet */
+        --text-color: #f0f0f0;
+        --text-muted-color: #a0a0a0;
+        --text-dark-color: #050505;
+        --neon-blue: #0abdc6;
+        --neon-purple: #9b59b6;
+        --neon-green: #2ecc71;
+        --neon-pink: #e91e63;
+        --neon-yellow: #f1c40f;
+        --neon-red: #e74c3c;
+        --neon-gray: #7f8c8d;
+        --glow-color: var(--neon-purple);
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0a0a0a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #ffffff;
+        border-radius: 3px;
+        box-shadow: 0 0 4px #fff, 0 0 8px #fff, 0 0 12px var(--glow-color);
+      }
+
+      /* Base Card Style */
+      .card-base {
+        background-color: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 0.5rem;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 0 15px rgba(138, 43, 226, 0.2), 0 0 25px rgba(138, 43, 226, 0.1);
+        transition: all 0.3s ease-in-out;
+      }
+      .card-base:hover {
+        border-color: var(--glow-color);
+        box-shadow: 0 0 20px rgba(138, 43, 226, 0.4), 0 0 35px rgba(138, 43, 226, 0.2);
+      }
+      
+      /* Button Styles */
+      .btn-base {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        border-radius: 0.375rem;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 0 5px transparent;
+      }
+      .btn-base:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      .btn-base:not(:disabled) {
+        transform: perspective(1px) translateZ(0);
+      }
+      .btn-base:hover:not(:disabled) {
+          transform: scale(1.05);
+      }
+
+      .btn-primary {
+        background: var(--neon-purple);
+        color: var(--text-dark-color);
+        border-color: var(--neon-purple);
+      }
+      .btn-primary:hover:not(:disabled) {
+        box-shadow: 0 0 8px var(--neon-purple), 0 0 15px var(--neon-purple);
+        color: #fff;
+      }
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+        border-color: var(--text-muted-color);
+      }
+      .btn-secondary:hover:not(:disabled) {
+        border-color: var(--neon-blue);
+        color: var(--neon-blue);
+        box-shadow: 0 0 8px var(--neon-blue);
+      }
+      .btn-danger {
+        background: transparent;
+        color: var(--neon-pink);
+        border-color: var(--neon-pink);
+      }
+      .btn-danger:hover:not(:disabled) {
+        background: var(--neon-pink);
+        color: #fff;
+        box-shadow: 0 0 8px var(--neon-pink);
+      }
+      
+      /* Form Input Styles */
+      .form-input {
+        width: 100%;
+        background-color: rgba(0,0,0,0.3);
+        border: 1px solid var(--text-muted-color);
+        color: var(--text-color);
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+        transition: all 0.2s ease-in-out;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 8px var(--neon-blue);
+      }
+      
+      /* Text Colors */
+      .text-neon-blue { color: var(--neon-blue); }
+      .text-neon-purple { color: var(--neon-purple); }
+      .text-neon-green { color: var(--neon-green); }
+      .text-neon-pink { color: var(--neon-pink); }
+      .text-neon-yellow { color: var(--neon-yellow); }
+      .text-neon-red { color: var(--neon-red); }
+      
+      /* Background Colors for Badges */
+      .bg-neon-blue { background-color: var(--neon-blue); }
+      .bg-neon-purple { background-color: var(--neon-purple); }
+      .bg-neon-green { background-color: var(--neon-green); }
+      .bg-neon-pink { background-color: var(--neon-pink); }
+      .bg-neon-yellow { background-color: var(--neon-yellow); }
+      .bg-neon-red { background-color: var(--neon-red); }
+      .bg-neon-gray { background-color: #7f8c8d; }
+      
+      /* List Item */
+      .list-item-base {
+        background: rgba(30,30,30,0.5);
+        border: 1px solid #444;
+        border-left: 3px solid var(--neon-purple);
+        transition: all 0.3s ease;
+      }
+      .list-item-base:hover {
+        background: rgba(40,40,40,0.7);
+        border-color: var(--neon-purple);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      }
+
+      /* Tab Styles */
+      .tab-button {
+        border-bottom: 2px solid transparent;
+        color: var(--text-muted-color);
+        transition: all 0.3s ease;
+      }
+      .tab-button:hover {
+        color: var(--text-color);
+      }
+      .tab-button.active {
+        color: var(--neon-blue);
+        border-bottom-color: var(--neon-blue);
+      }
+      
+      /* Glow Animation for orb */
+      @keyframes glow-orb {
+        0%, 100% {
+          box-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple), 0 0 30px var(--neon-purple), 0 0 40px var(--neon-blue);
+        }
+        50% {
+          box-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue), 0 0 40px var(--neon-blue), 0 0 50px var(--neon-purple);
+        }
+      }
+
+      @keyframes fade-in {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "recharts": "https://esm.sh/recharts@^3.1.0",
+    "@google/genai": "https://esm.sh/@google/genai"
+  }
+}
+</script>
+</head>
+  <body class="font-sans">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
