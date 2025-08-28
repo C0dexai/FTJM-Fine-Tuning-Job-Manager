@@ -31,7 +31,6 @@ const JobCheckpointsTab: React.FC<JobCheckpointsTabProps> = ({ checkpoints }) =>
         name: c.step_number,
         'Train Loss': c.metrics.train_loss,
         'Validation Loss': c.metrics.valid_loss,
-        'Train Accuracy': c.metrics.train_mean_token_accuracy,
       }))
       .sort((a, b) => a.name! - b.name!);
   }, [checkpoints]);
@@ -43,7 +42,7 @@ const JobCheckpointsTab: React.FC<JobCheckpointsTabProps> = ({ checkpoints }) =>
   return (
     <div className="space-y-6">
       <Card>
-        <h3 className="text-lg font-semibold text-white mb-4">Training Metrics</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">Loss Metrics</h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
@@ -53,7 +52,6 @@ const JobCheckpointsTab: React.FC<JobCheckpointsTabProps> = ({ checkpoints }) =>
             <Legend wrapperStyle={{fontSize: "14px", color: 'var(--text-color)'}}/>
             <Line type="monotone" dataKey="Train Loss" stroke="var(--neon-purple)" activeDot={{ r: 8 }} strokeWidth={2} />
             <Line type="monotone" dataKey="Validation Loss" stroke="var(--neon-green)" strokeWidth={2} />
-            <Line type="monotone" dataKey="Train Accuracy" stroke="var(--neon-pink)" yAxisId={0} strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </Card>

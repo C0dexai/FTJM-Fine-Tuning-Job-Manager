@@ -1,4 +1,3 @@
-
 import { 
   Container, 
   ContainerFile,
@@ -84,6 +83,23 @@ export const deleteContainer = (id: string): Promise<{ id: string; deleted: bool
   delete containerFiles[id];
   return mockApiCall({ id, deleted: true });
 };
+
+const updateContainerStatus = (containerId: string, status: ContainerStatus): Promise<Container | undefined> => {
+  const containerIndex = containers.findIndex(c => c.id === containerId);
+  if (containerIndex > -1) {
+    const container = containers[containerIndex];
+    if (container.status === 'creating') {
+      return mockApiCall(container); // Do not change status while creating
+    }
+    container.status = status;
+    container.last_active_at = Date.now() / 1000;
+    return mockApiCall({ ...container });
+  }
+  return mockApiCall(undefined);
+};
+
+export const startContainer = (containerId: string) => updateContainerStatus(containerId, 'running');
+export const stopContainer = (containerId: string) => updateContainerStatus(containerId, 'stopped');
 
 export const listContainerFiles = (containerId: string): Promise<ContainerFile[]> => {
   const files = containerFiles[containerId] || [];

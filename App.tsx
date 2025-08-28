@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   listJobs,
@@ -9,7 +8,7 @@ import {
   resumeJob 
 } from './services/fineTuningService';
 import { listVectorStores, retrieveVectorStore, createVectorStore, deleteVectorStore } from './services/vectorStoreService';
-import { listContainers, retrieveContainer, createContainer, deleteContainer } from './services/containerService';
+import { listContainers, retrieveContainer, createContainer, deleteContainer, startContainer, stopContainer } from './services/containerService';
 import { listTasks, retrieveTask, createTask } from './services/orchestrationService';
 import { FineTuningJob, CreateJobPayload, VectorStore, CreateVectorStorePayload, OrchestrationTask, CreateOrchestrationTaskPayload, Container, CreateContainerPayload } from './types';
 import FineTuningDashboard from './components/FineTuningDashboard';
@@ -36,6 +35,7 @@ const App: React.FC = () => {
   const [jobs, setJobs] = useState<FineTuningJob[]>([]);
   const [selectedJob, setSelectedJob] = useState<FineTuningJob | null>(null);
   const [isCreateJobModalOpen, setCreateJobModalOpen] = useState<boolean>(false);
+  const [jobToRequeue, setJobToRequeue] = useState<FineTuningJob | null>(null);
 
   // Vector store state
   const [vectorStores, setVectorStores] = useState<VectorStore[]>([]);
@@ -130,7 +130,16 @@ const App: React.FC = () => {
     loadJobs();
   };
 
-  const handleJobAction = async (jobId: string, action: 'cancel' | 'pause' | 'resume') => {
+  const handleJobAction = async (jobId: string, action: 'cancel' | 'pause' | 'resume' | 'requeue') => {
+    if (action === 'requeue') {
+      const jobToEdit = jobs.find(j => j.id === jobId);
+      if (jobToEdit) {
+        setJobToRequeue(jobToEdit);
+        setCreateJobModalOpen(true);
+      }
+      return;
+    }
+    
     const actionFunc = { cancel: cancelJob, pause: pauseJob, resume: resumeJob }[action];
     const updatedJob = await actionFunc(jobId);
     if (updatedJob) {
@@ -186,6 +195,17 @@ const App: React.FC = () => {
   const handleDeleteContainer = async (id: string) => {
     await deleteContainer(id);
     loadContainers();
+  };
+
+  const handleContainerAction = async (containerId: string, action: 'start' | 'stop') => {
+    const actionFunc = { start: startContainer, stop: stopContainer }[action];
+    const updatedContainer = await actionFunc(containerId);
+    if (updatedContainer) {
+      if (selectedContainer?.id === containerId) {
+        setSelectedContainer(updatedContainer);
+      }
+      setContainers(prev => prev.map(c => (c.id === containerId ? updatedContainer : c)));
+    }
   };
 
   const handleSelectTask = async (taskId: string) => {
@@ -259,6 +279,7 @@ const App: React.FC = () => {
           container={selectedContainer} 
           onBack={handleBackToContainerDashboard} 
           onContainerUpdate={loadContainers}
+          onAction={handleContainerAction}
         />
       ) : (
         <ContainerDashboard
@@ -268,6 +289,7 @@ const App: React.FC = () => {
           onRefresh={loadContainers}
           onDeleteContainer={handleDeleteContainer}
           onOpenCreateModal={() => setCreateContainerModalOpen(true)}
+          onAction={handleContainerAction}
         />
       );
     }
@@ -312,8 +334,12 @@ const App: React.FC = () => {
 
       <CreateJobModal
         isOpen={isCreateJobModalOpen}
-        onClose={() => setCreateJobModalOpen(false)}
+        onClose={() => {
+          setCreateJobModalOpen(false);
+          setJobToRequeue(null);
+        }}
         onSubmit={handleCreateJob}
+        initialData={jobToRequeue}
       />
       <CreateVectorStoreModal
         isOpen={isCreateVSModalOpen}

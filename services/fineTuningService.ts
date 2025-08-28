@@ -135,15 +135,20 @@ export const createJob = (payload: CreateJobPayload): Promise<FineTuningJob> => 
 const updateJobStatus = (jobId: string, status: JobStatus): Promise<FineTuningJob | undefined> => {
   const jobIndex = jobs.findIndex(j => j.id === jobId);
   if (jobIndex > -1) {
-    jobs[jobIndex].status = status;
-    return mockApiCall(jobs[jobIndex]);
+    const job = jobs[jobIndex];
+    job.status = status;
+    if (status === 'cancelled' || status === 'failed' || status === 'succeeded') {
+        job.finished_at = Date.now() / 1000;
+        job.estimated_finish = null;
+    }
+    return mockApiCall({ ...job });
   }
   return mockApiCall(undefined);
 };
 
 export const cancelJob = (jobId: string) => updateJobStatus(jobId, 'cancelled');
 export const pauseJob = (jobId: string) => updateJobStatus(jobId, 'paused');
-export const resumeJob = (jobId: string) => updateJobStatus(jobId, 'queued');
+export const resumeJob = (jobId: string) => updateJobStatus(jobId, 'running');
 
 export const listEvents = (jobId: string): Promise<FineTuningJobEvent[]> => {
   const job = jobs.find(j => j.id === jobId);

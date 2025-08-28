@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { FineTuningJob, FineTuningJobEvent, FineTuningJobCheckpoint } from '../types';
 import { STATUS_COLORS } from '../constants';
@@ -16,6 +15,13 @@ interface JobDetailViewProps {
 }
 
 type Tab = 'Details' | 'Events' | 'Checkpoints';
+
+const DetailItem: React.FC<{ label: string; children: React.ReactNode; }> = ({ label, children }) => (
+  <div>
+    <dt className="text-sm font-medium text-gray-400 uppercase tracking-wider">{label}</dt>
+    <dd className="mt-1 text-sm text-gray-200 font-mono break-words">{children || <span className="text-gray-500">N/A</span>}</dd>
+  </div>
+);
 
 const JobDetailView: React.FC<JobDetailViewProps> = ({ job, onBack }) => {
   const [activeTab, setActiveTab] = useState<Tab>('Details');
@@ -60,7 +66,7 @@ const JobDetailView: React.FC<JobDetailViewProps> = ({ job, onBack }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ animation: 'fade-in 0.5s ease' }}>
       <Card>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -76,6 +82,17 @@ const JobDetailView: React.FC<JobDetailViewProps> = ({ job, onBack }) => {
           </div>
         </div>
       </Card>
+
+      {job.error && (
+        <Card className="!border-neon-red" style={{ animation: 'fade-in 0.5s ease-out' }}>
+          <h3 className="text-lg font-semibold text-neon-red mb-2">Error Details</h3>
+          <dl className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
+            <DetailItem label="Code"><span className="text-red-400">{job.error.code}</span></DetailItem>
+            <DetailItem label="Parameter"><span className="text-red-400">{job.error.param}</span></DetailItem>
+            <DetailItem label="Message"><span className="text-red-400">{job.error.message}</span></DetailItem>
+          </dl>
+        </Card>
+      )}
 
       <div>
         <div className="border-b border-[rgba(255,255,255,0.1)] mb-6">

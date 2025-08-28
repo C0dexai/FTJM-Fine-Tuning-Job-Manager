@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { FineTuningJob } from '../types';
 import Card from './ui/Card';
@@ -39,17 +38,6 @@ const JobDetailsTab: React.FC<JobDetailsTabProps> = ({ job }) => {
           <DetailItem label="Estimated Finish">{job.estimated_finish ? new Date(job.estimated_finish * 1000).toLocaleString() : 'N/A'}</DetailItem>
         </dl>
       </Card>
-      
-      {job.error && (
-        <Card className="lg:col-span-3 !border-neon-red">
-          <h3 className="text-lg font-semibold text-neon-red mb-2">Error Details</h3>
-          <dl className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
-            <DetailItem label="Code"><span className="text-red-400">{job.error.code}</span></DetailItem>
-            <DetailItem label="Parameter"><span className="text-red-400">{job.error.param}</span></DetailItem>
-            <DetailItem label="Message"><span className="text-red-400">{job.error.message}</span></DetailItem>
-          </dl>
-        </Card>
-      )}
 
       <Card className="lg:col-span-3">
         <h3 className="text-lg font-semibold text-white mb-4">Hyperparameters</h3>

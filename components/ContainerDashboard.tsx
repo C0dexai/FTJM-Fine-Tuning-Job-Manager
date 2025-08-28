@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Container } from '../types';
 import ContainerListItem from './ContainerListItem';
@@ -12,6 +11,7 @@ interface ContainerDashboardProps {
   onRefresh: () => void;
   onDeleteContainer: (id: string) => void;
   onOpenCreateModal: () => void;
+  onAction: (id: string, action: 'start' | 'stop') => void;
 }
 
 const PlusIcon = () => (
@@ -31,6 +31,7 @@ const ContainerDashboard: React.FC<ContainerDashboardProps> = ({
   onRefresh,
   onDeleteContainer,
   onOpenCreateModal,
+  onAction,
 }) => {
   return (
     <div className="space-y-6">
@@ -62,6 +63,7 @@ const ContainerDashboard: React.FC<ContainerDashboardProps> = ({
                 container={c}
                 onSelect={onSelectContainer}
                 onDelete={onDeleteContainer}
+                onAction={onAction}
               />
             ))}
           </div>

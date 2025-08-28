@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { CreateJobPayload } from '../types';
+import React, { useState, useEffect } from 'react';
+import { CreateJobPayload, FineTuningJob } from '../types';
 import { SUPPORTED_MODELS } from '../constants';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
@@ -9,9 +9,10 @@ interface CreateJobModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (payload: CreateJobPayload) => Promise<void>;
+  initialData?: FineTuningJob | null;
 }
 
-const CreateJobModal: React.FC<CreateJobModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const CreateJobModal: React.FC<CreateJobModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [model, setModel] = useState(SUPPORTED_MODELS[0]);
   const [trainingFile, setTrainingFile] = useState('');
   const [validationFile, setValidationFile] = useState('');
@@ -19,6 +20,32 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({ isOpen, onClose, onSubm
   const [seed, setSeed] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [title, setTitle] = useState('Create New Fine-Tuning Job');
+
+  const resetForm = () => {
+    setModel(SUPPORTED_MODELS[0]);
+    setTrainingFile('');
+    setValidationFile('');
+    setSuffix('');
+    setSeed('');
+    setError('');
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        setTitle('Retry / Requeue Job');
+        setModel(initialData.model);
+        setTrainingFile(initialData.training_file);
+        setValidationFile(initialData.validation_file || '');
+        setSuffix(initialData.metadata?.suffix ? `${initialData.metadata.suffix}-retry-1` : 'retry-1');
+        setSeed(initialData.seed ? String(initialData.seed) : '');
+      } else {
+        setTitle('Create New Fine-Tuning Job');
+        resetForm();
+      }
+    }
+  }, [isOpen, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,22 +68,12 @@ const CreateJobModal: React.FC<CreateJobModalProps> = ({ isOpen, onClose, onSubm
     onClose();
   };
   
-  const resetForm = () => {
-    setModel(SUPPORTED_MODELS[0]);
-    setTrainingFile('');
-    setValidationFile('');
-    setSuffix('');
-    setSeed('');
-    setError('');
-  };
-
   const handleClose = () => {
-    resetForm();
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Create New Fine-Tuning Job">
+    <Modal isOpen={isOpen} onClose={handleClose} title={title}>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="model" className="block text-sm font-medium text-gray-300 mb-1">Base Model</label>
